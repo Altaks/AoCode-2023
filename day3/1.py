@@ -38,10 +38,7 @@ class NumberRectangle:
         return self.__value
 
     def __str__(self):
-        return f"""
- X (min: {self.minX()}, max: {self.maxX()})       Y (min: {self.minY()}, max: {self.maxY()})
- Valeur: {self.__value}
-        """
+        return f"Valeur: {self.__value},  minX:{self.minX()}, minY:{self.minY()}, maxX: {self.maxX()}, maxY: {self.maxY()}"
 
     def minX(self) -> int:
         return self.__left_up[0]
@@ -54,6 +51,7 @@ class NumberRectangle:
 
     def maxY(self) -> int:
         return self.__right_down[1]
+
 
 class SymbolRectangle:
     __left_up = (None, None)
@@ -82,10 +80,7 @@ class SymbolRectangle:
         return self.__symbol
 
     def __str__(self):
-        return f"""
- X (min: {self.minX()}, max: {self.maxX()})       Y (min: {self.minY()}, max: {self.maxY()})
- Symbole: {self.__symbol}
-        """
+        return f"Symbol: {self.__symbol} minX:{self.minX()}, minY:{self.minY()}, maxX: {self.maxX()}, maxY: {self.maxY()}"
 
     def minX(self) -> int:
         return self.__left_up[0]
@@ -124,12 +119,16 @@ for value in pool:
             if not walker_anchor:
                 walker_anchor = walker_position
 
-            if walker_position +1 < line_len and not value[walker_position + 1].isdigit():
+            if walker_position + 1 < line_len and not value[walker_position + 1].isdigit():
                 numbers_rects.append(NumberRectangle(walker_anchor, walker_position, pool.index(value), value))
                 walker_anchor = None
 
         walker_position += 1
 
+for nb_rect in numbers_rects:
+    print(nb_rect)
+
+print("\n")
 symbols_rects = []
 
 # Detect all symbols
@@ -144,13 +143,20 @@ for value in pool:
                 SymbolRectangle(i - 1, i + 1, pool.index(value) - 1, pool.index(value) + 1, letter)
             )
 
-somme = 0
+for symbol_rect in symbols_rects:
+    print(symbol_rect)
+
+collides = []
 
 for nb_rect in numbers_rects:
-    for symbol in symbols_rects:
-        if(symbol.intersects(nb_rect)):
-            somme += nb_rect.getValue()
+    for symbol_rect in symbols_rects:
+        if symbol_rect.intersects(nb_rect):
+            collides.append(nb_rect)
+            print(f"Detected collision between number {nb_rect.getValue()} and symbol {symbol_rect.getSymbol()}")
             break
 
+somme = 0
+for nb in collides:
+    somme += nb.getValue()
 
 print(somme)
